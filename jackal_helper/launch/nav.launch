@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="jackal_helper" type="barn_nav.py" name="barn_nav" output="screen" />
+</launch>
