@@ -207,44 +207,52 @@ def my_shutdown_hook():
     rospy.loginfo("It's shutdown time!")
 
 
-def main():
-    rospy.init_node('barn_nav', anonymous=True)
-    rate = rospy.Rate(100)  # 10hz
-
-    nav_as = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
-    mb_goal = MoveBaseGoal()
-    mb_goal.target_pose.header.frame_id = 'odom'
-    mb_goal.target_pose.pose.position.x = 0
-    mb_goal.target_pose.pose.position.y = 10
-    mb_goal.target_pose.pose.position.z = 0
-    mb_goal.target_pose.pose.orientation = Quaternion(0, 0, 0, 1)
-    nav_as.wait_for_server()
-    nav_as.send_goal(mb_goal)
-
-    while not rospy.is_shutdown():
-        rate.sleep()
-
 # def main():
+#     rospy.init_node('barn_nav', anonymous=True)
+#     rate = rospy.Rate(100)  # 10hz
+#
+#     nav_as = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
+#     mb_goal = MoveBaseGoal()
+#     mb_goal.target_pose.header.frame_id = 'odom'
+#     mb_goal.target_pose.pose.position.x = 0
+#     mb_goal.target_pose.pose.position.y = 10
+#     mb_goal.target_pose.pose.position.z = 0
+#     mb_goal.target_pose.pose.orientation = Quaternion(0, 0, 0, 1)
+#     nav_as.wait_for_server()
+#     nav_as.send_goal(mb_goal)
+#
+#     rospy.spin()
+
+def main():
     # global message
     # message = messageClass()
     # gaps = rospy.Subscriber('/gapGoal', Float32MultiArray, gapGoalCallback)
     # odom_sub = rospy.Subscriber('/odometry/filtered', Odometry, odomCallback)
     # scan_sub = rospy.Subscriber('/front/scan', LaserScan, scanCallback)
-    # vel_Pub = rospy.Publisher('/jackal_velocity_controller/cmd_vel', Twist, queue_size=10)
+    rospy.init_node('barn_nav', anonymous=True)
+    vel_Pub = rospy.Publisher('/jackal_velocity_controller/cmd_vel', Twist, queue_size=10)
+
+    rate = rospy.Rate(100)  # 10hz
+
+    maxSpeed = 1
+    minSpeed = 0.1
+    maxTurn = m.pi / 2
+    isDone = False
+    twist = Twist()
+    twist.linear.x = maxSpeed
+    twist.angular.z = 0
+
+    while not rospy.is_shutdown():
+
+        vel_Pub.publish(twist)
+        print 'published'
+
+        rate.sleep()
+
+    rospy.spin()
+
+
     #
-    # rospy.init_node('old_mcdonalds_local', anonymous=True)
-    # rate = rospy.Rate(100)  # 10hz
-    #
-    # maxSpeed = 1
-    # minSpeed = 0.1
-    # maxTurn = m.pi / 2
-    # isDone = False
-    # twist = Twist()
-    # twist.linear.x = minSpeed
-    # twist.angular.z = 0
-
-
-
     # message.goalx = message.posx
     # message.goaly = message.posy + 10
     # kp = 0.55
