@@ -254,8 +254,10 @@ def main():
     while vel_Pub.get_num_connections() < 1:
         time.sleep(1)
 
-    vel_Pub.publish(twist)
-    print 'published'
+    while not rospy.is_shutdown():
+        vel_Pub.publish(twist)
+        print 'published'
+        rate.sleep()
 
 
     #
