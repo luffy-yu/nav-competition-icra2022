@@ -1,4 +1,6 @@
 #! /usr/bin/env python
+import time
+
 import rospy
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose
@@ -223,14 +225,20 @@ def my_shutdown_hook():
 #
 #     rospy.spin()
 
+ready = False
+def odom_sub(msg):
+    print 'odom_sub'
+
 def main():
     # global message
     # message = messageClass()
     # gaps = rospy.Subscriber('/gapGoal', Float32MultiArray, gapGoalCallback)
     # odom_sub = rospy.Subscriber('/odometry/filtered', Odometry, odomCallback)
     # scan_sub = rospy.Subscriber('/front/scan', LaserScan, scanCallback)
+    # global ready
     rospy.init_node('barn_nav', anonymous=True)
     vel_Pub = rospy.Publisher('/jackal_velocity_controller/cmd_vel', Twist, queue_size=10)
+    sub = rospy.Subscriber('/jackal_velocity_controller/odom', Odometry, odom_sub)
 
     rate = rospy.Rate(100)  # 10hz
 
@@ -242,14 +250,12 @@ def main():
     twist.linear.x = maxSpeed
     twist.angular.z = 0
 
-    while not rospy.is_shutdown():
+    # wait for ROS ready
+    while vel_Pub.get_num_connections() < 1:
+        time.sleep(1)
 
-        vel_Pub.publish(twist)
-        print 'published'
-
-        rate.sleep()
-
-    rospy.spin()
+    vel_Pub.publish(twist)
+    print 'published'
 
 
     #
